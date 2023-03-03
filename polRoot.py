@@ -21,6 +21,9 @@ elif args.initP2 is None:
 print(args.initP, args.initP2)
 print("maxIter:", args.maxIter)
 print("polyFileName:", args.polyFileName)
+if not args.polyFileName.endswith(".pol"):
+    print("OH FUCK")
+    exit()
 
 class Polynomial:
     def __init__(self, n, L):
@@ -37,9 +40,11 @@ class Polynomial:
             sum = sum + self.L[i] * (self.n-i) * pow(x,self.n-i-1)
         return sum
 
-n = 3
-a = [3, 5, 0, -7]
+file = open(args.polyFileName,"r")
+n = int(file.readline())
+a = [float(x) for x in file.readline().split(" ")]
 f = Polynomial(n, a)
+file.close()
 
 def bisection(a, b, maxIter, eps):
     fa,fb = f.get(a),f.get(b)
