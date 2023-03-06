@@ -96,21 +96,28 @@ def secant(f, a, b, maxIter, eps):
     return Output(a, maxIter, "fail")
 
 def hybrid(f, a, b, maxIter, eps):
-    ans = bisection(f, a, b, int(maxIter/2), eps)
-    bit = ans.iterations
-    ans = newton(f, ans.root, int(maxIter/2), eps, 0)
+    bit = 1
+    ans = bisection(f, a, b, 1, eps)
+    while abs(f.get(ans.root)) > 1 and bit < maxIter:
+        if f.get(a) * f.get(ans.root) > 0:
+            a = ans.root
+        else:
+            b = ans.root
+        ans = bisection(f, a, b, 1, eps)
+        bit = bit + 1
+    ans = newton(f, ans.root, maxIter - bit, eps, 0)
     return Output(ans.root, bit + ans.iterations, ans.outcome)
 
 ans = Output(None, None, None)
+eps = 0.0000001
 if args.newt:
-    ans = newton(p, initP, maxIter, 0, 0)
+    ans = newton(p, initP, maxIter, eps, eps)
 elif args.sec:
-    ans = secant(p, initP, initP2, maxIter, 0)
+    ans = secant(p, initP, initP2, maxIter, eps)
 elif args.hybrid:
-    ans = hybrid(p, initP, initP2, maxIter, 0)
+    ans = hybrid(p, initP, initP2, maxIter, eps)
 else:
-    ans = bisection(p, initP, initP2, maxIter, 0)
-
+    ans = bisection(p, initP, initP2, maxIter, eps)
 file_name = args.polyFileName.replace(".pol",".sol")
 file = open(file_name, "w")
 file.write(ans.to_str())
